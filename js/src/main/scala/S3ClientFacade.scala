@@ -1,10 +1,12 @@
+package io.github.keirlawson.simple3
+
 import scalajs.js.annotation._
 import scalajs.js
 import fs2.io.Readable
 
 object S3ClientFacade {
   trait S3ClientConfig extends js.Object {
-    val region: String
+    val region: js.UndefOr[String]
   }
 
   trait GetObjectCommandInput extends js.Object {

@@ -1,3 +1,5 @@
+package io.github.keirlawson.simple3
+
 import cats.effect.Resource
 import software.amazon.awssdk.services.s3
 import cats.effect.Sync
@@ -5,7 +7,7 @@ import fs2.Stream
 import fs2.io.readInputStream
 import cats.Applicative
 
-object JvmS3Client {
+trait S3ClientPlatform {
   def resource[F[_]: Sync]: Resource[F, S3Client[F]] = {
     Resource.fromAutoCloseable(Sync[F].delay(s3.S3Client.create())).map {
       client =>
@@ -19,7 +21,7 @@ object JvmS3Client {
               .build()
             val stream = readInputStream[F](
               Sync[F].delay(client.getObject(request)),
-              64 * 1024 //match the default chunk size on Node
+              64 * 1024 // match the default chunk size on Node
             )
             Applicative[F].pure(stream)
           }

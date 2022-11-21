@@ -1,3 +1,5 @@
+package io.github.keirlawson.simple3
+
 import cats.effect.Resource
 import cats.effect.IO
 import fs2.Stream
@@ -12,13 +14,13 @@ import cats.effect.Sync
 import cats.syntax.all._
 import fs2.io.suspendReadableAndRead
 import fs2.io.Readable
+import scalajs.js.JSConverters._
 
-object JsS3Client {
-  // FIXME do we need region? create our own enum for it?
-  def resource[F[_]: Async](awsRegion: String): Resource[F, S3Client[F]] = {
+trait S3ClientPlatform {
+  def resource[F[_]: Async]: Resource[F, S3Client[F]] = {
     val res =
       Resource.make(Sync[F].delay(new UnderlyingS3Client(new S3ClientConfig {
-        val region = awsRegion
+        val region = Option.empty.orUndefined
       })))(c => Sync[F].delay(c.destroy))
     res.map { underlying =>
       new S3Client[F] {
